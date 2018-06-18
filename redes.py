@@ -24,6 +24,12 @@ def simpleTest():
     print ("Testing network connectivity")
     net.pingAll()
     net.stop()
+    f = open('/tmp/date.out')
+    lineno = 1
+    for line in f.readlines():
+        print ("%d: %s" % ( lineno, line.strip() ))
+        lineno += 1
+    f.close()
 
 if __name__ == '__main__':
     # Tell mininet to print useful information
