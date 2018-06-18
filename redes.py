@@ -24,7 +24,7 @@ def simpleTest():
     print ("Testing network connectivity")
     net.pingAll()
     net.stop()
-    f = open('/out.txt')
+    f = open('out.txt')
     lineno = 1
     for line in f.readlines():
         print ("%d: %s" % ( lineno, line.strip() ))
