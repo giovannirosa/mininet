@@ -21,28 +21,28 @@ class DinfTopo(Topo):
     def build(self):
         # Master switch
         s0 = self.addSwitch('s0')
-        linkopts = dict(bw=1000, delay='5ms', loss=5, max_queue_size=1000, use_htb=True)
+        linkopts = dict(bw=100, delay='5ms', loss=4, max_queue_size=100, use_htb=True)
 
         # Creating Lab 12
         s1 = self.addSwitch('s1')
         for h in range(0, 60):
-            host = self.addHost('h%s' % (h + 1))
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
             self.addLink(host, s1, **linkopts)
 
         # Creating Lab 3
         s2 = self.addSwitch('s2')
         for h in range(60, 90):
-            host = self.addHost('h%s' % (h + 1))
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
             self.addLink(host, s2, **linkopts)
 
         # Creating Lab 4
         s3 = self.addSwitch('s3')
         for h in range(90, 120):
-            host = self.addHost('h%s' % (h + 1))
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
             self.addLink(host, s3, **linkopts)
 
         # Linking master switch with laboratories switches
-        linkopts = dict(bw=10000, delay='1ms', loss=2, max_queue_size=10000, use_htb=True)
+        linkopts = dict(bw=1000, delay='1ms', loss=2, max_queue_size=1000, use_htb=True)
         self.addLink(s0, s1, **linkopts)
         self.addLink(s0, s2, **linkopts)
         self.addLink(s0, s3, **linkopts)
