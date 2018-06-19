@@ -4,58 +4,59 @@ from mininet.net import Mininet
 from mininet.log import setLogLevel, info
 from mininet.node import RemoteController
 from mininet.cli import CLI
+from mininet.util import dumpNodeConnections
+from mininet.node import CPULimitedHost
+from mininet.link import TCLink
 """
 Instructions to run the topo:
-    1. Go to directory where this fil is.
-    2. run: sudo -E python Simple_Pkt_Topo.py.py
+    1. Go to directory where this file is.
+    2. run: sudo python redes.py
 
-The topo has 4 switches and 4 hosts. They are connected in a star shape.
+This topo represents the Department of Informatics at the Federal University of Parana
 """
 
 
-class SimplePktSwitch(Topo):
-    """Simple topology example."""
+class DinfTopo(Topo):
+    """Dinf topology example."""
+    def build(self):
+        # Master switch
+        s0 = self.addSwitch('s0')
+        linkopts = dict(bw=100, delay='5ms', loss=4, max_queue_size=100, use_htb=True)
 
-    def __init__(self, **opts):
-        """Create custom topo."""
+        # Creating Lab 12
+        s1 = self.addSwitch('s1')
+        for h in range(0, 60):
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
+            self.addLink(host, s1, **linkopts)
 
-        # Initialize topology
-        # It uses the constructor for the Topo cloass
-        super(SimplePktSwitch, self).__init__(**opts)
+        # Creating Lab 3
+        s2 = self.addSwitch('s2')
+        for h in range(60, 90):
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
+            self.addLink(host, s2, **linkopts)
 
-        # Add hosts and switches
-        h1 = self.addHost('h1')
-        h2 = self.addHost('h2')
-        h3 = self.addHost('h3')
-        h4 = self.addHost('h4')
+        # Creating Lab 4
+        s3 = self.addSwitch('s3')
+        for h in range(90, 120):
+            host = self.addHost('h%s' % (h + 1), cpu=.5/120)
+            self.addLink(host, s3, **linkopts)
 
-        # Adding switches
-        s1 = self.addSwitch('s1', dpid="0000000000000001")
-        s2 = self.addSwitch('s2', dpid="0000000000000002")
-        s3 = self.addSwitch('s3', dpid="0000000000000003")
-        s4 = self.addSwitch('s4', dpid="0000000000000004")
-
-        # Add links
-        self.addLink(h1, s1)
-        self.addLink(h2, s2)
-        self.addLink(h3, s3)
-        self.addLink(h4, s4)
-
-        self.addLink(s1, s2)
-        self.addLink(s1, s3)
-        self.addLink(s1, s4)
+        # Linking master switch with laboratories switches
+        linkopts = dict(bw=1000, delay='1ms', loss=2, max_queue_size=1000, use_htb=True)
+        self.addLink(s0, s1, **linkopts)
+        self.addLink(s0, s2, **linkopts)
+        self.addLink(s0, s3, **linkopts)
 
 
 def run():
-    c = RemoteController('c', '0.0.0.0', 6633)
-    net = Mininet(topo=SimplePktSwitch(), host=CPULimitedHost, controller=None)
-    net.addController(c)
+    net = Mininet(topo=DinfTopo(), host=CPULimitedHost, link=TCLink)
     net.start()
+    # print "Dumping host connections"
+    # dumpNodeConnections(net.hosts)
 
     CLI(net)
     net.stop()
 
-# if the script is run directly (sudo custom/optical.py):
 if __name__ == '__main__':
     setLogLevel('info')
     run()
